@@ -1,5 +1,5 @@
 package PDF::Writer;
-$PDF::Writer::VERSION = '0.01';
+$PDF::Writer::VERSION = '0.02';
 
 use strict;
 use vars '$Backend';
@@ -10,7 +10,7 @@ PDF::Writer - PDF abstraction layer
 
 =head1 VERSION
 
-This document describes version 0.01 of PDF::Writer.
+This document describes version 0.02 of PDF::Writer.
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,7 @@
 package PDF::Writer::pdfapi2;
 
 use strict;
+use charnames ':full';
 use PDF::API2 0.40;
 
 =head1 NAME
@@ -113,39 +114,106 @@ sub color {
     $self->{txt}->strokecolor(@colors) unless $mode eq 'fill';
 }
 
+my @SuperScript = (
+    "\N{SUPERSCRIPT ZERO}", "\N{SUPERSCRIPT ONE}", "\N{SUPERSCRIPT TWO}",
+    "\N{SUPERSCRIPT THREE}", "\N{SUPERSCRIPT FOUR}", "\N{SUPERSCRIPT FIVE}",
+    "\N{SUPERSCRIPT SIX}", "\N{SUPERSCRIPT SEVEN}", "\N{SUPERSCRIPT EIGHT}",
+    "\N{SUPERSCRIPT NINE}",
+);
+my @SubScript = (
+    "\N{SUBSCRIPT ZERO}", "\N{SUBSCRIPT ONE}", "\N{SUBSCRIPT TWO}",
+    "\N{SUBSCRIPT THREE}", "\N{SUBSCRIPT FOUR}", "\N{SUBSCRIPT FIVE}",
+    "\N{SUBSCRIPT SIX}", "\N{SUBSCRIPT SEVEN}", "\N{SUBSCRIPT EIGHT}",
+    "\N{SUBSCRIPT NINE}",
+);
+
 sub show_boxed {
     my $self = shift; my $p = $self->{pdf};
     my ($str, $x, $y, $w, $h, $j, $m) = @_;
+    my $txt = $self->{txt};
 
     return 0 if $m eq 'blind';
 
     my $method = 'text';
-    if ($j eq 'right') {
+    if ($j =~ /right/) {
         $x += $w;
         $method .= "_$j";
     }
-    elsif ($j eq 'center') {
+    elsif ($j =~ /center/) {
         $x += $w / 2;
         $method .= "_$j";
     }
 
-    $self->{txt}->translate($x, $y);
+    $txt->translate($x, $y);
 
     my @tokens = split(/ /, $str);
     my @try;
+    my $advance_width;
     while (@tokens) {
         push @try, shift(@tokens);
-        if ($self->{txt}->advancewidth("@try") >= $w) {
+        $advance_width = $txt->advancewidth("@try");
+        if ($advance_width >= $w) {
             # overflow only if absolutely neccessary
             pop @try if @try > 1;
-            $self->{txt}->can($method)->($self->{txt}, "@try");
-            return length($str) - length("@try");
+
+            my $chunk = $self->_transform_text("@try");
+            $self->_draw_underline($txt->advancewidth($chunk)) if $j =~ /underline/;
+
+            # XXX - sup/sub handling here
+            $txt->can($method)->($self->{txt}, $chunk);
+            return length($str) - length($chunk);
         }
     }
 
-    $self->{txt}->can($method)->($self->{txt}, $str);
+    my $chunk = $self->_transform_text($str);
+    $self->_draw_underline($txt->advancewidth($chunk)) if $j =~ /underline/;
+    $txt->can($method)->($self->{txt}, $chunk);
 
     return 0;
+}
+
+sub _transform_text {
+    my ($self, $text) = @_;
+    my $found;
+    foreach my $i (0..9) {
+        # XXX - handle subscript.
+        # also, redraw using ->transform, instead of substituting
+        $found++ if $text =~ s/$SuperScript[$i]/<-<$i>->/g;
+    }
+    if ($found) {
+        $text =~ s/>-><-<//g;
+        $text =~ s/<-</ [/g;
+        $text =~ s/>->/]/g;
+    }
+    return $text;
+}
+
+sub _draw_underline {
+    my $self = shift;
+    my $width = shift or return;
+
+    my ($txt, $gfx) = @{$self}{'txt', 'gfx'};
+
+    my %state = $txt->textstate;
+    my ($x1, $y1) = $txt->textpos;
+    $txt->matrix_update($width, 0);
+    my ($x2, $y2) = $txt->textpos;
+    my $x3 = $x1 + (($y2 - $y1) / $width)
+             * ($txt->{' font'}->underlineposition * $txt->{' fontsize'} / 1000);
+    my $y3 = $y1 + (($x2 - $x1) / $width)
+             * ($txt->{' font'}->underlineposition * $txt->{' fontsize' }/ 1000);
+    my $x4 = $x3 + ($x2 - $x1);
+    my $y4 = $y3 + ($y2 - $y1);
+    $gfx->add('ET');
+    $gfx->save;
+    $gfx->linewidth(0.5);
+    $gfx->strokecolor(0, 0, 0);
+    $gfx->move($x3, $y3);
+    $gfx->line($x4, $y4);
+    $gfx->stroke;
+    $gfx->restore;
+    $gfx->add('BT');
+    $txt->textstate(%state);
 }
 
 sub show_xy {
