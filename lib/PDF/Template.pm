@@ -36,16 +36,6 @@ sub new
     $self->{PARAM_MAP} = {} unless UNIVERSAL::isa($self->{PARAM_MAP}, 'HASH');
 
     $self->{PDF_VERSION} = 0;
-    for my $version (reverse 1 .. 5)
-    {
-        eval "UNIVERSAL::VERSION('pdflib_pl', $version.0)";
-        unless ($@)
-        {
-            $self->{PDF_VERSION} = $version;
-            last;
-        }
-    }
-    #die "Cannot find pdflib_pl version",$/ unless $self->{PDF_VERSION};
 
     $self->_validate_option($_)
         for qw(OPENACTION OPENMODE);
@@ -79,9 +69,6 @@ sub write_file
     my ($fname) = @_;
 
     my $p = PDF::API2->new;
-
-    #pdflib_pl::PDF_open_file($p, $fname) == -1
-    #    && die "pdflib_pl::PDF_open_file could not open file '$fname'.", $/;
 
     $self->_prepare_output($p);
 

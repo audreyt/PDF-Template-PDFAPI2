@@ -1,19 +1,10 @@
-MANIFEST
-LICENSE
-README
-TESTPLAN
-Todo
 Changes
-Makefile.PL
+Changes.PDFAPI2
+examples/report.xml
 lib/PDF/Template.pm
 lib/PDF/Template/Base.pm
 lib/PDF/Template/Constants.pm
 lib/PDF/Template/Container.pm
-lib/PDF/Template/Context.pm
-lib/PDF/Template/Element.pm
-lib/PDF/Template/Factory.pm
-lib/PDF/Template/Iterator.pm
-lib/PDF/Template/TextObject.pm
 lib/PDF/Template/Container/Always.pm
 lib/PDF/Template/Container/Conditional.pm
 lib/PDF/Template/Container/Font.pm
@@ -26,6 +17,8 @@ lib/PDF/Template/Container/PdfTemplate.pm
 lib/PDF/Template/Container/Row.pm
 lib/PDF/Template/Container/Scope.pm
 lib/PDF/Template/Container/Section.pm
+lib/PDF/Template/Context.pm
+lib/PDF/Template/Element.pm
 lib/PDF/Template/Element/Bookmark.pm
 lib/PDF/Template/Element/Circle.pm
 lib/PDF/Template/Element/HorizontalRule.pm
@@ -35,7 +28,14 @@ lib/PDF/Template/Element/PageBreak.pm
 lib/PDF/Template/Element/TextBox.pm
 lib/PDF/Template/Element/Var.pm
 lib/PDF/Template/Element/Weblink.pm
-examples/report.xml
+lib/PDF/Template/Factory.pm
+lib/PDF/Template/Iterator.pm
+lib/PDF/Template/TextObject.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
 t/001_load.t
 t/002_simple.t
 t/003_basic.t
@@ -51,4 +51,5 @@ t/templates/002_3/xml.txt
 t/templates/003_1/buffer.txt
 t/templates/003_1/vars.txt
 t/templates/003_1/xml.txt
-META.yml                                 Module meta-data (added by MakeMaker)
+TESTPLAN
+Todo

@@ -128,22 +128,23 @@ sub deltas
 sub _display_doublebyte
 {
     my $self = shift;
-    my ($p, $str, $x, $y, $j, $font_size) = @_;
+    my ($context, $str, $x, $y, $j, $font_size) = @_;
+
+    my $method = 'text';
 
     if ($j eq 'right')
     {
-#       $x -= $str->length * $font_size;
         $x -= length($str) * $font_size;
+        $method .= "_$j";
     }
     elsif ($j eq 'center')
     {
-#       $x -= ($str->length / 2) * $font_size;
         $x -= (length($str) / 2) * $font_size;
+        $method .= "_$j";
     }
 
-#   Unicode::String->stringify_as('ucs2');
-#   pdflib_pl::PDF_show_xy($p, $str->as_string, $x, $y);
-    pdflib_pl::PDF_show_xy($p, $str, $x, $y);
+    $context->{TXT}->translate($x, $y);
+    $context->{TXT}->$method($str);
 
     return 0;
 }
@@ -157,8 +158,7 @@ sub _show_boxed
     my $encoding = $context->get($self, 'PDF_ENCODING') || 'host';
     if ($encoding eq 'host')
     {
-#       Unicode::String->stringify_as('latin1');
-#       my $leftovers = pdflib_pl::PDF_show_boxed($context->{PDF}, $str->as_string, @_);
+        return 0 if $m eq 'blind';
 
 	if (my $enc = $context->get($self, 'ENCODING')) {
 	    require Encode;
@@ -185,13 +185,13 @@ sub _show_boxed
     }
 
 
-    my $font_size = pdflib_pl::PDF_get_value($p, 'fontsize', undef);
+    my $font_size = $context->{TXT}{' fontsize'};
     die "Fontsize of 0!", $/ if $font_size <= 0;
 
     if ($w == 0 && $h == 0)
     {
         return 0 if $m eq 'blind';
-        return $self->_display_doublebyte($p, $str, $x, $y, $j, $font_size);
+        return $self->_display_doublebyte($context, $str, $x, $y, $j, $font_size);
     }
 
     my $num_lines = int($h / $font_size);
@@ -212,13 +212,13 @@ sub _show_boxed
         if (length($str) <= $chars_per_line)
         {
             return 0 if $m eq 'blind';
-            return $self->_display_doublebyte($p, $str, $start_x, $current_y, $j, $font_size);
+            return $self->_display_doublebyte($context, $str, $start_x, $current_y, $j, $font_size);
         }
 
 #       my $str_this_line = $str->substr(0, $chars_per_line);
         my $str_this_line = substr($str, 0, $chars_per_line);
 
-        $self->_display_doublebyte($p, $str_this_line, $start_x, $current_y, $j, $font_size)
+        $self->_display_doublebyte($context, $str_this_line, $start_x, $current_y, $j, $font_size)
             unless $m eq 'blind';
 
         $current_y -= $font_size;
@@ -252,22 +252,18 @@ sub show_boxed
             $x, $y, $w, $h,
             $align, $mode,
         );
-        die "Invalid return ($leftovers) from pdflib_pl::PDF_show_boxed() on string '$str'", $/
-#           if $leftovers > $str->length;
+        die "Invalid return ($leftovers) from _show_boxed() on string '$str'", $/
             if $leftovers > length($str);
 
         last LOOP if $context->get($self, 'TRUNCATE_TEXT');
 
-#       if ($leftovers < $str->length)
         if ($leftovers < length($str))
         {
             last LOOP unless $excess_txt || $leftovers;
 
-#           $str = ($leftovers ? $str->substr(-1 * $leftovers) : '' ) . $excess_txt;
             $str = ($leftovers ? substr($str, -1 * $leftovers) : '' ) . $excess_txt;
             $excess_txt = '';
 
-#           $str = $str->substr(1) while $str->substr(0, 1) =~ /^[\r\n\s]+/o;
             $str =~ s/^[\r\n\s]+//go;
 
             $y -= $h;
@@ -278,9 +274,6 @@ sub show_boxed
 
         last LOOP unless $leftovers;
 
-#       $excess_txt = $str->chop . $excess_txt;
-#       $excess_txt = $str->chop . $excess_txt
-#           while $str->substr(-1) =~ /^[\r\n\s]$/o;
         $excess_txt = chop($str) . $excess_txt;
         $excess_txt = chop($str) . $excess_txt
             while $str =~ /[\r\n\s]$/o;
