@@ -19,6 +19,7 @@ sub render
     return 1 if $context->{CALC_LAST_PAGE};
 
     my $p = $context->{PDF};
+    $p->save_state;
 
     $self->set_color($context, 'COLOR', 'both');
 
@@ -26,12 +27,12 @@ sub render
 
     my $width = $context->get($self, 'WIDTH') || 1;
 
-    my $gfx = $context->{GFX};
-    $gfx->linewidth($width);
-    $gfx->move($vals->{X1}, $vals->{Y1});
-    $gfx->line($vals->{X2}, $vals->{Y2});
-    $gfx->close;
-    $gfx->stroke;
+    $p->linewidth($width);
+    $p->move($vals->{X1}, $vals->{Y1});
+    $p->line($vals->{X2}, $vals->{Y2});
+    $p->stroke;
+
+    $p->restore_state;
 
     return 1;
 }

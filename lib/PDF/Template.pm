@@ -10,7 +10,7 @@ BEGIN {
     @ISA     = qw (PDF::Template::Base);
 }
 
-use PDF::API2 0.40;
+use PDF::Writer;
 
 use File::Basename;
 use IO::File;
@@ -68,11 +68,12 @@ sub write_file
     my $self = shift;
     my ($fname) = @_;
 
-    my $p = PDF::API2->new;
+    my $p = PDF::Writer->new;
+    $p->open($fname) or die "Could not open file '$fname'.", $/;
 
     $self->_prepare_output($p);
 
-    $p->saveas($fname);
+    $p->save;
 
     return 1;
 }
@@ -88,7 +89,8 @@ sub get_buffer
 {
     my $self = shift;
 
-    my $p = PDF::API2->new;
+    my $p = PDF::Writer->new;
+    $p->open or die "Could not open buffer.", $/;
 
     $self->_prepare_output($p);
 
@@ -205,6 +207,9 @@ sub _prepare_output
 {
     my $self = shift;
     my ($p) = @_;
+
+    $p->parameter('openaction' => $self->{OPENACTION});
+    $p->parameter('openmode' => $self->{OPENMODE});
 
     if (UNIVERSAL::isa($self->{INFO}, 'HASH'))
     {

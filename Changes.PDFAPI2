@@ -1,4 +1,20 @@
 ----------------------------------------------------------------------
+r25:  autrijus | 2004-06-03T14:42:41.591674Z
+
+* depend on PDF::API2 only if pdflib_pl is unavailable.
+* use Encode::compat instead of Unicode::String for recoding.
+----------------------------------------------------------------------
+r24:  autrijus | 2004-06-03T14:39:38.966859Z
+
+* Abstracted PDF::API2 and pdflib_pl backends into PDF::Writer.
+* Tested on simple PDFs and verified that both backends work.
+* Introduces "text_encoding", a new attribute to ease text recoding.
+
+----------------------------------------------------------------------
+r21:  autrijus | 2004-06-02T19:38:11.789749Z
+
+* changes.
+----------------------------------------------------------------------
 r20:  autrijus | 2004-06-02T19:36:22.420915Z
 
 * 0.40_02.

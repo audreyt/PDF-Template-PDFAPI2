@@ -53,9 +53,10 @@ sub preprocess
     $context->{PARAM_MAP}[0]{__LAST_PAGE__} = 0;
     unless ($context->get($self, 'NOLASTPAGE'))
     {
-        my @old = @{$context}{qw( PDF GFX TXT )};
+        my $old_PDF = $context->{PDF};
 
-        my $p = PDF::API2->new;
+        my $p = PDF::Writer->new;
+        $p->open or die "Could not open buffer.", $/;
 
         $context->{PDF} = $p;
 
@@ -63,10 +64,11 @@ sub preprocess
         $self->SUPER::render($context);
         $context->{CALC_LAST_PAGE} = 0;
 
+        $p->close;
         $self->reset;
         $context->delete_fonts;
 
-        @{$context}{qw( PDF GFX TXT )} = @old;
+        $context->{PDF} = $old_PDF;
         $context->{PARAM_MAP}[0]{__LAST_PAGE__} = $context->{PARAM_MAP}[0]{__PAGE__} - 1;
         $context->{PARAM_MAP}[0]{__PAGE__} = 1;
         $context->{PARAM_MAP}[0]{__PAGEDEF__} = 0;

@@ -7,8 +7,6 @@ BEGIN {
     @ISA = qw(PDF::Template::Element);
 
     use PDF::Template::Element;
-
-#   use Unicode::String;
 }
 
 sub new
@@ -128,23 +126,18 @@ sub deltas
 sub _display_doublebyte
 {
     my $self = shift;
-    my ($context, $str, $x, $y, $j, $font_size) = @_;
-
-    my $method = 'text';
+    my ($p, $str, $x, $y, $j, $font_size) = @_;
 
     if ($j eq 'right')
     {
         $x -= length($str) * $font_size;
-        $method .= "_$j";
     }
     elsif ($j eq 'center')
     {
         $x -= (length($str) / 2) * $font_size;
-        $method .= "_$j";
     }
 
-    $context->{TXT}->translate($x, $y);
-    $context->{TXT}->$method($str);
+    $p->show_xy($str, $x, $y);
 
     return 0;
 }
@@ -153,45 +146,34 @@ sub _show_boxed
 {
     my $self = shift;
     my $context = shift;
-    my ($p, $str, $x, $y, $w, $h, $j, $m) = ($context->{PDF}, @_);
 
     my $encoding = $context->get($self, 'PDF_ENCODING') || 'host';
-    if ($encoding eq 'host')
+
+    if (my $text_encoding = $context->get($self, 'TEXT_ENCODING'))
     {
-        return 0 if $m eq 'blind';
-
-	if (my $enc = $context->get($self, 'ENCODING')) {
-	    require Encode;
-	    $str = Encode::decode($enc => $str);
-	}
-
-	my $method = 'text';
-	if ($j eq 'right') {
-	    $x += $w;
-	    $method .= "_$j";
-	}
-	elsif ($j eq 'center') {
-	    $x += $w / 2;
-	    $method .= "_$j";
-	}
-
-	$context->{TXT}->translate($x, $y);
-	$context->{TXT}->$method($str);
-	return 0;
-
-#       $leftovers++ if $leftovers && $leftovers == $str->length - 1;
-#        $leftovers++ if $leftovers && $leftovers == length($str) - 1;
-#        return $leftovers;
+        require Encode::compat if $] <= 5.008;
+        require Encode;
+        unshift @_, Encode::decode($text_encoding => shift(@_));
     }
 
+    if ($encoding eq 'host')
+    {
+        my $str = shift;
+        my $leftovers = $context->{PDF}->show_boxed($str, @_);
 
-    my $font_size = $context->{TXT}{' fontsize'};
+        $leftovers++ if $leftovers && $leftovers == length($str) - 1;
+        return $leftovers;
+    }
+
+    my ($p, $str, $x, $y, $w, $h, $j, $m) = ($context->{PDF}, @_);
+
+    my $font_size = $p->font_size;
     die "Fontsize of 0!", $/ if $font_size <= 0;
 
     if ($w == 0 && $h == 0)
     {
         return 0 if $m eq 'blind';
-        return $self->_display_doublebyte($context, $str, $x, $y, $j, $font_size);
+        return $self->_display_doublebyte($p, $str, $x, $y, $j, $font_size);
     }
 
     my $num_lines = int($h / $font_size);
@@ -212,13 +194,13 @@ sub _show_boxed
         if (length($str) <= $chars_per_line)
         {
             return 0 if $m eq 'blind';
-            return $self->_display_doublebyte($context, $str, $start_x, $current_y, $j, $font_size);
+            return $self->_display_doublebyte($p, $str, $start_x, $current_y, $j, $font_size);
         }
 
 #       my $str_this_line = $str->substr(0, $chars_per_line);
         my $str_this_line = substr($str, 0, $chars_per_line);
 
-        $self->_display_doublebyte($context, $str_this_line, $start_x, $current_y, $j, $font_size)
+        $self->_display_doublebyte($p, $str_this_line, $start_x, $current_y, $j, $font_size)
             unless $m eq 'blind';
 
         $current_y -= $font_size;
@@ -235,7 +217,7 @@ sub show_boxed
     my $self = shift;
     my ($context, $str, $x, $y, $w, $h, $align, $mode) = @_;
 
-    my $fsize = $context->{TXT}{' fontsize'};
+    my $fsize = $context->{PDF}->font_size;
     $fsize = 0 if $fsize < 0;
 
 #   return $h unless $str->length && ($fsize && $h / $fsize >= 1);

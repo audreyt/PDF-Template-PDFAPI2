@@ -25,6 +25,7 @@ sub render
 {
     my $self = shift;
     my ($context) = @_;
+    my $p = $context->{PDF};
 
     my $size = $context->get($self, 'H') ||
         $context->get($self, 'SIZE') ||
@@ -35,7 +36,7 @@ sub render
     my $font = $context->retrieve_font($face);
     $font == -1 && die "Font not found for '$face' by the time <font> was rendered", $/;
 
-    $context->{TXT}->font($font, $size);
+    $p->font($font, $size);
 
     push @current_font, [ $font, $size ];
 
@@ -47,7 +48,7 @@ sub render
 
     return $child_success unless @current_font;
 
-    $context->{TXT}->font(@{$current_font[-1]});
+    $p->font(@{$current_font[-1]});
 
     return $child_success;
 }
@@ -64,20 +65,12 @@ sub begin_page
 
     unless ($context->retrieve_font($face))
     {
-        my $encoding = $context->get($self, 'PDF_ENCODING');
-        my $mode = (
-            ($face =~ /\.(?:pf[ab]|ps)$/i)
-                ? 'ps' :
-            ($face =~ /\.(?:ttf|otf|ttc)$/i)
-                ? 'tt' :
-            ($face =~ /(traditional|simplified|korean|japanese2?)/)
-                ? 'cjk'
-            : 'core'
-        ) . 'font';
+        my $encoding = $context->get($self, 'PDF_ENCODING') || 'host';
 
-        my $font = $context->{PDF}->$mode(
+        my $font = $context->{PDF}->find_font(
             $face,
-            -encode => $encoding,
+            $encoding,
+            $context->get($self, 'EMBED'),
         ) or die "Font not found for '$face' by the time <font> was rendered", $/;
 
         $context->store_font($face, $font);

@@ -63,7 +63,7 @@ our %Verify = (
 
     # Pagesize is specified in points
     'PAGESIZE' => {
-        '__DEFAULT__' => 'A4LANDSCAPE',
+        '__DEFAULT__' => 'A4',
         'Letter' => {
             PAGE_WIDTH => 8.5 * $PointsPer{I},
             PAGE_HEIGHT => 11 * $PointsPer{I},
@@ -91,10 +91,6 @@ our %Verify = (
         'A4' => {
             PAGE_WIDTH => 595,
             PAGE_HEIGHT => 842,
-        },
-        'A4LANDSCAPE' => {
-            PAGE_WIDTH => 842,
-            PAGE_HEIGHT => 595,
         },
     },
 );

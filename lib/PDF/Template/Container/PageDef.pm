@@ -136,16 +136,11 @@ sub render
     while (!$done)
     {
         $self->begin_page($context);
-
-	my $page = $context->{PDF}->page;
-	$page->mediabox($pwidth, $pheight);
-
-	$context->{PAGE} = $page;
-	$context->{GFX} = $page->gfx;
-	$context->{TXT} = $page->text;
+        $context->{PDF}->begin_page($pwidth, $pheight);
 
         $done = $self->iterate_over_children($context);
 
+        $context->{PDF}->end_page;
         $self->end_page($context);
 
         $context->increment_pagenumber unless $context->get($self, 'NOPAGENUMBER');

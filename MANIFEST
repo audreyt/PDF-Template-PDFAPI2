@@ -31,6 +31,9 @@ lib/PDF/Template/Element/Weblink.pm
 lib/PDF/Template/Factory.pm
 lib/PDF/Template/Iterator.pm
 lib/PDF/Template/TextObject.pm
+lib/PDF/Writer.pm
+lib/PDF/Writer/pdfapi2.pm
+lib/PDF/Writer/pdflib.pm
 LICENSE
 Makefile.PL
 MANIFEST
