@@ -30,11 +30,7 @@ sub render
         $context->get($self, $_) || 0
     } qw( X1 Y1 X2 Y2 );
 
-    pdflib_pl::PDF_add_weblink(
-        $context->{PDF},
-        @dimensions,
-        $url,
-    );
+    $context->{PDF}->add_weblink( @dimensions, $url );
 
     return 1;
 }

@@ -34,7 +34,7 @@ sub render
 
     my $p = $context->{PDF};
 
-    pdflib_pl::PDF_save($p);
+    $p->save_state;
 
     $self->set_color($context, 'COLOR', 'stroke');
 
@@ -42,20 +42,20 @@ sub render
     $self->set_color($context, 'FILLCOLOR', 'fill');
 
     my $width = $context->get($self, 'WIDTH') || 1;
-    pdflib_pl::PDF_setlinewidth($p, $width);
+    $p->linewidth($width);
 
-    pdflib_pl::PDF_circle($p, $x, $y, $r);
+    $p->circle($x, $y, $r);
 
     if (defined $fillcolor)
     {
-        pdflib_pl::PDF_fill_stroke($p);
+        $p->fill_stroke;
     }
     else
     {
-        pdflib_pl::PDF_stroke($p);
+        $p->stroke;
     }
 
-    pdflib_pl::PDF_restore($p);
+    $p->restore_state;
 
     return 1;
 }

@@ -1,4 +1,22 @@
 ----------------------------------------------------------------------
+r38:  autrijus | 2004-07-18T00:47:59.270453Z
+
+* This be 0.40_09.
+* PDF::Writer refactored out to be PDF-Writer-0.03 on CPAN.
+----------------------------------------------------------------------
+r37:  autrijus | 2004-07-18T00:33:52.569510Z
+
+* finally, all of pdflib_pl() methods are now gone from PDF::Template.
+----------------------------------------------------------------------
+r36:  autrijus | 2004-07-17T23:11:17.456766Z
+
+* Fix malformed PDF sequences in underlines.
+* Fix extra whitespace before superscripts.
+----------------------------------------------------------------------
+r35:  autrijus | 2004-07-17T20:47:06.920580Z
+
+* changes.
+----------------------------------------------------------------------
 r34:  autrijus | 2004-07-17T20:45:05.164165Z
 
 * This be 0.40_07, with rudimentary underline, superscript and subscript support.

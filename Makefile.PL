@@ -21,6 +21,7 @@ my $prereqs = {
     'XML::Parser'    => 0.01,
     'IO::File'       => 0.01,
     'File::Basename' => 0.01,
+    'PDF::Writer'    => 0.03,
 };
 
 $prereqs{'PDF::API2'} = 0.40 unless eval { require pdflib_pl; 1 };
@@ -35,7 +36,7 @@ if ($] < 5.008)
 WriteMakefile(
     DISTNAME     => 'PDF-Template-PDFAPI2',
     NAME         => 'PDF::Template',
-    VERSION      => '0.40_07',
+    VERSION      => '0.40_09',
     AUTHOR       => 'Autrijus Tang <autrijus@autrijus.org>',
     ABSTRACT     => 'PDF::Template',
     PREREQ_PM    => $prereqs,

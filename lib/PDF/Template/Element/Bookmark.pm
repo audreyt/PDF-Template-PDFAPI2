@@ -36,7 +36,7 @@ sub render
         $txt = 'undefined';
     }
 
-    pdflib_pl::PDF_add_bookmark($context->{PDF}, $txt, 0, 0);
+    $context->{PDF}->add_bookmark($txt, 0, 0);
 
     return 1;
 }
