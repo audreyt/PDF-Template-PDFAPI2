@@ -35,10 +35,13 @@ sub begin_page
         die "Image does not have a filename", $/;
 
     my $image = $context->retrieve_image($txt);
+    my $p = $context->{PDF};
+
     unless ($image)
     {
         # automatically resolve type if extension is obvious and type was not specified
         my $type = $context->get($self, 'TYPE');
+
         unless ($type)
         {
             ($type) = $txt =~ /\.(\w+)$/o;
@@ -51,14 +54,14 @@ sub begin_page
         $type = lc $type;
         $type = $convertImageType{$type} if exists $convertImageType{$type};
 
-        $image = pdflib_pl::PDF_open_image_file($context->{PDF}, $type, $txt, '', 0);
+        $image = $p->open_image($type, $txt, '', 0);
         $image == -1 and die "Cannot open <image> file '$txt'", $/;
 
         $context->store_image($txt, $image);
     }
 
-    $self->{IMAGE_HEIGHT} = pdflib_pl::PDF_get_value($context->{PDF}, 'imageheight', $image);
-    $self->{IMAGE_WIDTH}  = pdflib_pl::PDF_get_value($context->{PDF}, 'imagewidth', $image);
+    $self->{IMAGE_HEIGHT} = $p->image_height($image);
+    $self->{IMAGE_WIDTH}  = $p->image_width($image);
 
     die "Image '$txt' has 0 (or less) height.", $/ if $self->{IMAGE_HEIGHT} <= 0;
     die "Image '$txt' has 0 (or less) width.", $/  if $self->{IMAGE_WIDTH} <= 0;
@@ -84,12 +87,10 @@ sub render
 
     $self->set_values($context, $txt);
 
+    my $p = $context->{PDF};
     my ($x, $y, $scale) = map { $context->get($self, $_) } qw(X Y SCALE);
 
-    pdflib_pl::PDF_place_image(
-        $context->{PDF},
-        $image, $x, $y, $scale,
-    );
+    $p->place_image( $image, $x, $y - $self->{IMAGE_HEIGHT}, $scale );
 
     if ($context->get($self, 'BORDER'))
     {

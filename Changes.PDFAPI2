@@ -1,4 +1,14 @@
 ----------------------------------------------------------------------
+r31:  autrijus | 2004-07-16T03:21:41.485157Z
+
+* 0.40_05.
+* Support for <image> on both pdfapi2 and pdflib.
+* Fixed height miscalculation on PDF::Template::Element::Image::render.
+----------------------------------------------------------------------
+r30:  autrijus | 2004-07-15T00:53:39.193760Z
+
+* add the missing dirs to private repo.
+----------------------------------------------------------------------
 r29:  autrijus | 2004-06-23T12:35:24.629892Z
 
 * 0.40_04.

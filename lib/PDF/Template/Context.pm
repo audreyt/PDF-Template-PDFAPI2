@@ -259,8 +259,9 @@ sub check_end_of_page
 sub close_images
 {
     my $self = shift;
+    my $p = $self->{PDF};
 
-    pdflib_pl::PDF_close_image($self->{PDF}, $_) for values %{$self->{IMAGES}};
+    $p->close_image($_) for values %{$self->{IMAGES}};
 }
 
 sub new_page_def

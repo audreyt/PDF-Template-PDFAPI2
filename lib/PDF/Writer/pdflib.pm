@@ -35,6 +35,9 @@ my %dispatch = (
     stroke          => 'stroke',
     show_boxed      => 'show_boxed',
     show_xy         => 'show_xy',
+    open_image      => 'open_image_file',
+    close_image     => 'close_image',
+    place_image     => 'place_image',
 );
 
 sub new {
@@ -82,6 +85,18 @@ sub color {
 sub font_size {
     my $self = shift; my $p = $self->{pdf};
     return pdflib_pl::PDF_get_value($p, 'fontsize', undef);
+}
+
+sub image_width {
+    my $self = shift; my $p = $self->{pdf};
+    my ($image) = @_;
+    return pdflib_pl::PDF_get_value($p, 'imagewidth', $image);
+}
+
+sub image_height {
+    my $self = shift; my $p = $self->{pdf};
+    my ($image) = @_;
+    return pdflib_pl::PDF_get_value($p, 'imageheight', $image);
 }
 
 while (my ($k, $v) = each %dispatch) {

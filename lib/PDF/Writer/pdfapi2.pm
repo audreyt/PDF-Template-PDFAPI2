@@ -40,6 +40,36 @@ sub save {
     $p->saveas($self->{filename});
 }
 
+sub open_image {
+    my $self = shift; my $p = $self->{pdf};
+    my ($type, $file, $foo, $bar) = @_;
+
+    require "PDF/API2/Resource/XObject/Image/\U$type\E.pm";
+    return "PDF::API2::Resource::XObject::Image::\U$type\E"->new($p->{pdf}, $file);
+}
+
+sub image_width {
+    my $self = shift; my $p = $self->{pdf};
+    my ($image) = @_;
+    return $image->width;
+}
+
+sub image_height {
+    my $self = shift; my $p = $self->{pdf};
+    my ($image) = @_;
+    return $image->height;
+}
+
+sub place_image {
+    my $self = shift; my $p = $self->{pdf};
+    my ($image, $x, $y, $scale) = @_;
+    #$y -= $image->height;
+    $self->{gfx}->image($image, $x, $y, $scale);
+}
+
+sub close_image {
+}
+
 sub find_font {
     my $self = shift; my $p = $self->{pdf};
     my ($face, $pdf_encoding, $is_embed) = @_;
