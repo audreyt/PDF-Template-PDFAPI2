@@ -35,7 +35,7 @@ if ($] < 5.008)
 WriteMakefile(
     DISTNAME     => 'PDF-Template-PDFAPI2',
     NAME         => 'PDF::Template',
-    VERSION      => '0.40_03',
+    VERSION      => '0.40_04',
     AUTHOR       => 'Autrijus Tang <autrijus@autrijus.org>',
     ABSTRACT     => 'PDF::Template',
     PREREQ_PM    => $prereqs,

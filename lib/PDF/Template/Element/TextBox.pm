@@ -71,6 +71,8 @@ sub render
 
     $self->set_color($context, 'COLOR', 'both');
 
+    my ($orig_x, $orig_w) = ($x, $w);
+
     if (defined(my $lmargin = $context->get($self, 'LMARGIN')))
     {
         $x += $lmargin;
@@ -92,19 +94,19 @@ sub render
 
     if ($context->get($self, 'BGCOLOR'))
     {
-        pdflib_pl::PDF_save($context->{PDF});
+        $context->{PDF}->save_state;
 
         $self->set_color($context, 'BGCOLOR', 'fill');
 
-        pdflib_pl::PDF_rect($context->{PDF}, $x, $y - $self->{TEMP_H} + $h, $w, $self->{TEMP_H});
-        pdflib_pl::PDF_fill($context->{PDF});
-        pdflib_pl::PDF_restore($context->{PDF});
+        $context->{PDF}->rect($orig_x, $y - $self->{TEMP_H} + $h, $orig_w, $self->{TEMP_H});
+        $context->{PDF}->fill;
+        $context->{PDF}->restore_state;
     }
 
     if ($context->get($self, 'BORDER'))
     {
-        pdflib_pl::PDF_rect($context->{PDF}, $x, $y - $self->{TEMP_H} + $h, $w, $self->{TEMP_H});
-        pdflib_pl::PDF_stroke($context->{PDF});
+        $context->{PDF}->rect($orig_x, $y - $self->{TEMP_H} + $h, $orig_w, $self->{TEMP_H});
+        $context->{PDF}->stroke;
     }
 
     $self->set_color($context, 'COLOR', 'both', 1);
@@ -153,7 +155,8 @@ sub _show_boxed
     {
         require Encode::compat if $] <= 5.008;
         require Encode;
-        unshift @_, Encode::decode($text_encoding => shift(@_));
+        unshift @_, Encode::decode($text_encoding => shift(@_))
+          unless Encode::is_utf8($_[0]);
     }
 
     if ($encoding eq 'host')
