@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         PDF-Template-PDFAPI2
+version:      0.40_01
+version_from: 
+installdirs:  site
+requires:
+    File::Basename:                0.01
+    IO::File:                      0.01
+    PDF::API2:                     0.4
+    Test::Simple:                  0.44
+    XML::Parser:                   0.01
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.21

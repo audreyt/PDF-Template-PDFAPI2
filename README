@@ -1,0 +1,8 @@
+PDF::Template is a layout system that creates Adobe PDF files from the same
+data structure used by HTML::Template.
+
+This distribution is a development-in-progress fork by Autrijus Tang,
+with full intentions to remerge to the main PDF::Template tree
+at some point.
+
+The official maintainer of the PDF::Template module is Rob Kinyon.

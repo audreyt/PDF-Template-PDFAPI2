@@ -1,0 +1,39 @@
+<pdftemplate h="8">
+  <pagedef>
+    <font face="Times-Roman">
+      <header header_height="1.5i">
+        <image y="-1i">SomeSpecialImage.jpeg</image>
+      </header>
+  
+      <font face="Times-Roman-Bold">
+        <row>
+          <textbox w="25%" text="Name"/>
+          <textbox w="25%" text="Address"/>
+          <textbox w="25%" text="Some Value 1"/>
+          <textbox w="25%" text="Some Value 2"/>
+        </row>
+      </font>
+  
+      <loop name="LOOPY">
+        <row>
+          <textbox w="25%" text="$Name"/>
+          <textbox w="25%" text="$Address"/>
+          <textbox w="25%" text="$Value1"/>
+          <textbox w="25%" text="$Value2"/>
+        </row>
+      </loop>
+  
+      <row>
+        <textbox w="50%"/>
+        <textbox w="25%" text="$Total1"/>
+        <textbox w="25%" text="$Total2"/>
+      </row>
+  
+      <footer footer_height="1i">
+        <row>
+          <textbox w="100%" justify="right">Page <var value="__PAGE__"/></textbox>
+        </row>
+      </footer>
+    </font>
+  </pagedef>
+</pdftemplate>
