@@ -19,6 +19,16 @@ sub new
     return $self;
 }
 
+sub _deltas {
+    my $self = shift;
+    my ($context) = @_;
+
+    return {
+        X => $context->get($self, 'W'),
+        Y => $context->get($self, 'H'),
+    };
+}
+
 my %convertImageType = (
     'jpg' => 'jpeg',
 );
@@ -90,23 +100,19 @@ sub render
     my $p = $context->{PDF};
     my ($x, $y, $scale) = map { $context->get($self, $_) } qw(X Y SCALE);
 
-    $p->place_image( $image, $x, $y - $self->{IMAGE_HEIGHT}, $scale );
+    $p->place_image( $image, $x, $y - $self->{H}, $scale );
 
     if ($context->get($self, 'BORDER'))
     {
-        pdflib_pl::PDF_save($context->{PDF});
+        $p->save_state;
 
         $self->set_color($context, 'COLOR', 'both');
 
         my ($w, $h) = map { $context->get($self, $_) } qw(W H);
 
-        pdflib_pl::PDF_rect(
-            $context->{PDF},
-            $x, $y, $w, $h,
-        );
-        pdflib_pl::PDF_stroke($context->{PDF});
-
-        pdflib_pl::PDF_restore($context->{PDF});
+        $p->rect($x, $y, $w, $h);
+        $p->stroke;
+        $p->restore_state;
     }
 
     return 1;
@@ -147,12 +153,12 @@ sub set_values
         if (defined $w)
         {
             $self->{SCALE} = $w / $self->{IMAGE_WIDTH};
-            $self->{H} = $self->{IMAGE_HEIGHT} * $scale;
+            $self->{H} = $self->{IMAGE_HEIGHT} * $self->{SCALE};
         }
         elsif (defined $h)
         {
             $self->{SCALE} = $h / $self->{IMAGE_HEIGHT};
-            $self->{W} = $self->{IMAGE_WIDTH} * $scale;
+            $self->{W} = $self->{IMAGE_WIDTH} * $self->{SCALE};
         }
         else
         {

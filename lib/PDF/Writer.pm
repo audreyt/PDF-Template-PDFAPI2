@@ -10,7 +10,7 @@ PDF::Writer - PDF abstraction layer
 
 =head1 VERSION
 
-This document describes version 0.01 of PDF::Writer, released June 3, 2004.
+This document describes version 0.01 of PDF::Writer.
 
 =head1 SYNOPSIS
 

@@ -129,8 +129,20 @@ sub show_boxed {
         $method .= "_$j";
     }
 
-    # XXX - do wrappings correctly
     $self->{txt}->translate($x, $y);
+
+    my @tokens = split(/ /, $str);
+    my @try;
+    while (@tokens) {
+        push @try, shift(@tokens);
+        if ($self->{txt}->advancewidth("@try") >= $w) {
+            # overflow only if absolutely neccessary
+            pop @try if @try > 1;
+            $self->{txt}->can($method)->($self->{txt}, "@try");
+            return length($str) - length("@try");
+        }
+    }
+
     $self->{txt}->can($method)->($self->{txt}, $str);
 
     return 0;
